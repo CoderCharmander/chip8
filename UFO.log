@@ -1,0 +1,64 @@
+Loading 224 bytes from roms/UFO
+202: a2cd;
+204: 6938;
+206: 6a08;
+208: d9a3;
+20a: a2d0;
+20c: 6b00;
+20e: 6c03;
+210: dbc3;
+212: a2d6;
+214: 641d;
+216: 651f;
+218: d451;
+21a: 6700;
+21c: 680f;
+21e: 22a2Call 2a2(current pc: 21e
+;
+2a4: a2f8;
+2a6: f733;
+2a8: 6300;
+2aa: 22b6Call 2b6(current pc: 2aa
+;
+2b8: 6d1b;
+2ba: f265;
+2bc: f029;
+2be: d3d5;
+2c0: 7305;
+2c2: f129;
+2c4: d3d5;
+2c6: 7305;
+2c8: f229;
+2ca: d3d5;
+2cc: eeReturn
+2ac
+;
+2ae: a2f8;
+2b0: f833;
+2b2: 6332;
+2b4: 22b6Call 2b6(current pc: 2b4
+;
+2b8: 6d1b;
+2ba: f265;
+2bc: f029;
+2be: d3d5;
+2c0: 7305;
+2c2: f129;
+2c4: d3d5;
+2c6: 7305;
+2c8: f229;
+2ca: d3d5;
+2cc: eeReturn
+2b6
+;
+2b8: 6d1b;
+2ba: f265;
+2bc: f029;
+2be: d3d5;
+2c0: 7305;
+2c2: f129;
+2c4: d3d5;
+2c6: 7305;
+2c8: f229;
+2ca: d3d5;
+2cc: ee
