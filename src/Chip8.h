@@ -11,7 +11,6 @@
 
 class Chip8
 {
-    typedef void (opcode)(Instruction);
 private:
     uint8_t v[16];
     std::stack<uint16_t> stack;
@@ -46,7 +45,7 @@ private:
 
 public:
     Chip8(uint8_t *, uint16_t);
-    void cycle();
+    Instruction cycle();
     bool get_pixel(uint8_t x, uint8_t y);
     
 

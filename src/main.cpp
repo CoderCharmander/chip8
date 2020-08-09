@@ -2,13 +2,12 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <SFML/Graphics.hpp>
-
+#include "CursesInterface.h"
 #include "Chip8.h"
 
 float scale;
 
-void renderFrame(sf::RenderWindow &window, Chip8 &vm)
+/*void renderFrame(sf::RenderWindow &window, Chip8 &vm)
 {
     sf::RectangleShape shape(sf::Vector2f(scale, scale));
     shape.setFillColor(sf::Color::White);
@@ -26,7 +25,7 @@ void renderFrame(sf::RenderWindow &window, Chip8 &vm)
         }
     }
     window.display();
-}
+}*/
 
 int main(int argc, char *argv[])
 {
@@ -75,9 +74,13 @@ int main(int argc, char *argv[])
     Chip8 emulator(rom, size);
 
     delete[] rom;
+	INTERFACE iface(emulator);
+	while (iface.update()) {
+		iface.update_screen();
+	}
 
-    sf::RenderWindow window(sf::VideoMode(64 * scale, 32 * scale), "Chip8 emulator");
-    while (window.isOpen())
+    //sf::RenderWindow window(sf::VideoMode(64 * scale, 32 * scale), "Chip8 emulator");
+    /*while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event))
@@ -89,10 +92,7 @@ int main(int argc, char *argv[])
         }
         emulator.cycle();
         renderFrame(window, emulator);
-    }
-
-    Instruction instr(0x1234);
-    std::cout << instr.w0 << std::endl;
+    }*/
 
     return 0;
 }

@@ -55,28 +55,24 @@ Chip8::Chip8(uint8_t *rom, uint16_t romSize) : pc(0x200),
     memcpy(memory + 0x200, rom, romSize);
 }
 
-void Chip8::cycle()
+Instruction Chip8::cycle()
 {
+    if (delay_timer)
+        --delay_timer;
     if (waiting_for_key == -1)
     {
         Instruction instr(memory[pc] << 8 | memory[pc + 1]);
         pc += 2;
-        //if (instr.w0)
-        std::cout << std::hex << pc << ": " << instr.w0 << std::dec;
-        std::cout.flush();
         (opcodes[instr.h3])(*this, instr);
-        std::cout << ";" << std::endl;
+		return instr;
     }
-
-    if (delay_timer)
-        --delay_timer;
+	return Instruction(0);
 }
 
 void Chip8::op_system(Instruction inst)
 {
     if (inst.w0 == 0x00EE)
     {
-        std::cout << "Return" << std::endl;
         if (!stack.empty())
         {
             pc = stack.top();
@@ -86,7 +82,6 @@ void Chip8::op_system(Instruction inst)
         {
             pc = 0x200;
         }
-        std::cout << std::hex << pc << std::dec << std::endl;
     }
     else if(inst.w0 == 0x00E0)
     {
@@ -101,7 +96,6 @@ void Chip8::op_goto(Instruction inst)
 
 void Chip8::op_call(Instruction inst)
 {
-    std::cout << "Call " << std::hex << inst.a0 << "(current pc: " << pc << std::dec << std::endl;
     stack.push(pc);
     pc = inst.a0;
 }
@@ -209,7 +203,7 @@ void Chip8::op_draw(Instruction inst)
     for (int i = 0; i < height; i++)
     {
         std::bitset<8> line(memory[I + i]);
-        for (int j = 0; j < 8; j++)
+        for (int j = 7; j >= 0; --j)
         {
             bool prev = screen[x + i][y + j];
             screen[x + i][y + j] ^= line[j];

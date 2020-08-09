@@ -5,7 +5,7 @@ HEADERS := $(wildcard src/*.h)
 CXX ?= g++
 CXXFLAGS = -Wall -g
 LD := g++
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -g
+LDFLAGS ?= -lsfml-graphics -lsfml-window -lsfml-system -g
 
 OUTPUT = build/main
 
