@@ -157,12 +157,12 @@ void Chip8::op_arithmetic(Instruction inst)
         v[0xF] = store > *vx;
         break;
     case 6: //shift right
-        v[0xF] = *vx & 1;
-        *vx >>= 1;
+        v[0xF] = vy & 1;
+        *vx = vy >> 1;
         break;
     case 0xE: //shift left
-        v[0xF] = *v & 0b10000000;
-        *vx <<= 1;
+        v[0xF] = vy >> 7;
+        *vx = vy << 1;
         break;
     case 7: // rev sub
         *vx = vy - *vx;
@@ -196,18 +196,20 @@ void Chip8::op_random(Instruction inst)
 
 void Chip8::op_draw(Instruction inst)
 {
-    uint8_t x = v[inst.h2];
-    uint8_t y = v[inst.h1];
+    uint8_t x = v[inst.h2] % 64;
+    uint8_t y = v[inst.h1] % 32;
     uint8_t height = inst.h0;
     v[0xF] = 0;
     for (int i = 0; i < height; i++)
     {
         std::bitset<8> line(memory[I + i]);
-        for (int j = 7; j >= 0; --j)
+        for (int j = 0; j < 8; ++j)
         {
-            bool prev = screen[x + i][y + j];
-            screen[x + i][y + j] ^= line[j];
-            if (prev && !(screen[x + i][y + j]))
+			uint8_t pos_x = (x+7-j) % 64;
+			uint8_t pos_y = (y+i) % 32;
+            bool prev = screen[pos_x][pos_y];
+            screen[pos_x][pos_y] ^= line[j];
+            if (prev && line[j])
             {
                 v[0xF] = 1;
             }
@@ -295,4 +297,21 @@ void Chip8::release_key(uint8_t key)
 bool Chip8::get_pixel(uint8_t x, uint8_t y)
 {
     return screen[x][y];
+}
+
+uint8_t& Chip8::V(uint8_t idx) {
+	return v[idx];
+}
+
+uint8_t& Chip8::mem(uint16_t address) {
+	if (address >= 0x1000) return memory[0xFFF];
+	return memory[address];
+}
+
+uint16_t& Chip8::refI(Chip8::Internal ref) {
+	switch(ref) {
+		case Chip8I: return I;
+		case Chip8PC: return pc;
+	}
+	return I;
 }

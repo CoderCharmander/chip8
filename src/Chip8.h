@@ -47,9 +47,16 @@ public:
     Chip8(uint8_t *, uint16_t);
     Instruction cycle();
     bool get_pixel(uint8_t x, uint8_t y);
-    
+
+    enum Internal {
+		Chip8I,
+		Chip8PC
+	};
 
     void press_key(uint8_t);
     void release_key(uint8_t);
+	uint8_t& V(uint8_t);
+	uint8_t& mem(uint16_t);
+	uint16_t& refI(Chip8::Internal);
 };
 #endif

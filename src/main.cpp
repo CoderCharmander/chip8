@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (argc < 3)
+    /*if (argc < 3)
     {
         scale = 10.0f;
     }
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
             std::cerr << argv[0] << ": Please enter a valid scale value." << std::endl;
             return 2;
         }
-    }
+    }*/
 
     std::ifstream rom_file(argv[1], std::ios::binary | std::ios::ate);
     std::streampos begin, end;
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     Chip8 emulator(rom, size);
 
     delete[] rom;
-	INTERFACE iface(emulator);
+	INTERFACE iface(emulator, argc - 2, argv+2);
 	while (iface.update()) {
 		iface.update_screen();
 	}

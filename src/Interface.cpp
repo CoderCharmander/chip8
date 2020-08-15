@@ -1,4 +1,4 @@
 #include "Interface.h"
 
-Interface::Interface(Chip8& emu): emulator(emu) {
+Interface::Interface(Chip8& emu, int argc, char* args[]): emulator(emu) {
 }

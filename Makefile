@@ -3,7 +3,7 @@ OBJECTS := $(subst .cpp,.o,$(subst src/,build/,$(SOURCES)))
 HEADERS := $(wildcard src/*.h)
 
 CXX ?= g++
-CXXFLAGS = -Wall -g
+CXXFLAGS ?= -Wall -g
 LD := g++
 LDFLAGS ?= -lsfml-graphics -lsfml-window -lsfml-system -g
 
