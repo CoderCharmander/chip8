@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+build/
+
+*.log
+callgrind.out.*
+imgui.ini
+*.txt
+*.stats

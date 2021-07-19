@@ -2,7 +2,7 @@
 #include "Interface.h"
 
 #define INTERFACE CursesInterface
-class CursesInterface : Interface {
+class CursesInterface : public Interface {
 	public:
 		CursesInterface(Chip8&, int, char* args[]);
 		bool update();

@@ -1,98 +1,92 @@
-#include <iostream>
-#include <fstream>
+#include <chrono>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <thread>
 
-#include "CursesInterface.h"
 #include "Chip8.h"
+#include "SdlInterface.h"
 
 float scale;
 
-/*void renderFrame(sf::RenderWindow &window, Chip8 &vm)
-{
-    sf::RectangleShape shape(sf::Vector2f(scale, scale));
-    shape.setFillColor(sf::Color::White);
+void usage(std::string progname) {
+  std::cerr << "Usage: " << progname
+            << " [-c cyclespersec] ROMFILE [displaysize]" << std::endl;
+}
 
-    window.clear();
-
-    for (uint8_t i = 0; i < 64; i++)
-    {
-        for (uint8_t j = 0; j < 32; j++)
-        {
-            if (vm.get_pixel(i, j)) {
-                shape.setPosition(sf::Vector2f(i * scale, j * scale));
-                window.draw(shape);
-            }
-        }
-    }
-    window.display();
-}*/
-
-int main(int argc, char *argv[])
-{
-    if (argc < 2)
-    {
-        std::cerr << "Usage: " << argv[0] << " <rom> [display size]" << std::endl;
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    std::cerr << "Usage: " << argv[0] << " <rom> [display size]" << std::endl;
+    return 1;
+  }
+  char *rom_filename = nullptr;
+  uint32_t cycle_time = 0;
+  for (int i = 1; i < argc; ++i) {
+    std::string curr_arg = argv[i];
+    if (curr_arg == "-c" || curr_arg == "--cycle") {
+      if (i < argc - 1) {
+        cycle_time = ((double)1000.0) / std::atof(argv[++i]);
+        std::cerr << "Set cycle time to " << cycle_time << std::endl;
+      } else {
+        usage(argv[0]);
         return 1;
+      }
+    } else {
+      rom_filename = argv[i];
     }
+  }
 
-    /*if (argc < 3)
-    {
-        scale = 10.0f;
+  if (!rom_filename) {
+    usage(argv[0]);
+    return 1;
+  }
+
+  std::ifstream rom_file(rom_filename, std::ios::binary | std::ios::ate);
+  std::streampos begin, end;
+  if (!rom_file.is_open()) {
+    std::cerr << "Could not open ROM file " << argv[1] << std::endl;
+    return 3;
+  }
+  end = rom_file.tellg();
+  rom_file.seekg(0, std::ios::beg);
+  begin = rom_file.tellg();
+
+  size_t size = end - begin;
+  if (size > 0x1000 - 0x200) {
+    std::cerr << "The file is too large!" << std::endl;
+    return 4;
+  }
+
+  std::cout << "Loading " << size << " bytes from " << rom_filename
+            << std::endl;
+  uint8_t *rom = new uint8_t[size];
+  rom_file.read(reinterpret_cast<char *>(rom), size);
+  rom_file.close();
+
+  Chip8 emulator(rom, size);
+
+  delete[] rom;
+  INTERFACE iface(emulator, argc - 2, argv + 2);
+  if (iface.error_occurred()) {
+    std::cerr << "An error occurred while trying to initialize the interface: "
+              << iface.error_message() << std::endl;
+    return 1;
+  }
+
+  bool running = true;
+  std::chrono::milliseconds cycle_sleep_duration(cycle_time);
+  std::thread th_cycle([&]() {
+    while (iface.update()) {
+      std::this_thread::sleep_for(cycle_sleep_duration);
     }
-    else
-    {
-        scale = strtof(argv[2], nullptr);
+    running = false;
+  });
 
-        if (scale == 0.0f)
-        {
-            std::cerr << argv[0] << ": Please enter a valid scale value." << std::endl;
-            return 2;
-        }
-    }*/
+  while (running) {
+    iface.update_screen();
+  }
+  th_cycle.join();
 
-    std::ifstream rom_file(argv[1], std::ios::binary | std::ios::ate);
-    std::streampos begin, end;
-    if (!rom_file.is_open()) {
-        std::cerr << "Could not open ROM file " << argv[1] << std::endl;
-        return 3;
-    }
-    end = rom_file.tellg();
-    rom_file.seekg(0, std::ios::beg);
-    begin = rom_file.tellg();
-
-    size_t size = end - begin;
-    if (size > 0x1000 - 0x200) {
-        std::cerr << "The file is too large!" << std::endl;
-        return 4;
-    }
-
-    std::cout << "Loading " << size << " bytes from " << argv[1] << std::endl;
-    uint8_t* rom = new uint8_t[size];
-    rom_file.read(reinterpret_cast<char*>(rom), size);
-    rom_file.close();
-
-    Chip8 emulator(rom, size);
-
-    delete[] rom;
-	INTERFACE iface(emulator, argc - 2, argv+2);
-	while (iface.update()) {
-		iface.update_screen();
-	}
-
-    //sf::RenderWindow window(sf::VideoMode(64 * scale, 32 * scale), "Chip8 emulator");
-    /*while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-        }
-        emulator.cycle();
-        renderFrame(window, emulator);
-    }*/
-
-    return 0;
+  return 0;
 }
